@@ -234,8 +234,8 @@
 			<li>('incakoin', 'steps'): Similarity 0.5</li>
 			<li>('innova', 'desire'): Similarity 0.4</li>
 			<li>('dynamic', 'sequence'): Similarity 0.375</li>
-			<li>('masternodecoin', 'force'): Similarity 0.3333333333333333</li>
-			<li>('machinecoin', 'fujicoin'): Similarity 0.3333333333333333</li>
+			<li>('masternodecoin', 'force'): Similarity 0.33</li>
+			<li>('machinecoin', 'fujicoin'): Similarity 0.33</li>
 			</ul>
 
 			<p>Minimal similarities:</p>
@@ -280,9 +280,37 @@
 			<p>Now we want to add the most important attribute of a cryptocurrency into the mix - its marketcap. We want to discover whether statistics about the github repository of a currency can tell something about its economic value.</p>
 			<p>We downloaded marketcap values for the cryptocurrencies from <a href="https://coinmarketcap.com" target="_blank">coinmarketcap.com</a>. Now, we cann add these as node attributes to our graph.</p>
 			<img src="images/stargazer_count_and_market_cap.png">
+			<p>The correlation between follower count and marcetcap as found to be 0.94. This looks very good at first glance but plotting the data reveals that bitcoin and ethereum have such a big marketcap and follower basis that it renders the other currencies irrelevant. Hence, we will replot but the bitcoin and ethereum datapoints will be dropped.</p>
 			<img src="images/stargazer_count_and_market_cap_without_BTC_or_ETH.png">
-
-
+			<p>When looking at the same plot without the two currencies, we get a totally different picture and a much worse correlation. The correlation between follower count and marketcap without bitcoin or ethereum is 0.27.
+			<p>We can clearly see that there is no strong dependency between the two variables. Thus, we will try to find other variables that influence the marketcap</p>
+			<h3>3.2.4 Step 3: New variables</h3>
+			<p>We now want to find other variables that could have an impact on marketcap. First, we look at the time a currency's repository was created. We then calculate its age in days (until 3rd December 2017) and compare it to the monetary value. Because bitcoin and ethereum were some of the first currencies and are the biggest, we suspect a correlation. Wefound the correlation between age and marketcap to be 0.17</p>
+			<p>There is no good correlation, because many of the old currencies never made it big despite their age. We will therefore put this on ice.</p>
+			<p>Another idea would be the number of forks. If you want to experiment with code and maybe use it for your purposes, you need to create a fork. The idea is that cryptocurrencies with a high marketcap will have a high number of forks.</p>
+			<p>The correlation between the number of forks of a crypto-currency and marketcap was found to be 0.96</p>
+			<img src="images/forks_versus_marketcap.png">
+			<p>Again, bitcoin and ethereum falsify the result, so we take a closer look at the others. After removing Bitcoin and Ethereum from the data the correlation between forks and marketcap is 0.23</p>
+			<img src="images/forks_versus_marketcap_without_BTC_or_ETH.png">
+			<p>This metric is very similar to the follower count. The points are nearly at the same spots as in the corresponding follower plot. The correlation between these two attributes confirms this with correlation between forks and stargazers at 0.51</p>
+			<h3>3.2.5 Step 4: Multiple regression model</h3>
+			<p>Now we try our luck at putting a combination of these variables into one model to predict the marketcap. We will therefore leave out bitcoin and ethereum, as they are clear outliers and would heavily skew the result. We will try several combinations of the three attributes and compare their error. The model with the loest error will be the best one.</p>
+			<p>The model with all three attributes (age, stargazers, forcks) has the lowest error. However  the error istoo high to predict the marketcap of a cryptocurrency reliably. The marketcap of a cryptocurrency has probably different reasons than the information we can get from github. Take for example the currency "bitcoin-cash": It is a so-called hard fork of bitcoin that was introduced in July 2017. Thus, it has the third-highest marketcap of all the currencies in our dataset despite being very young and not having many stargazers on github.</p>
+			<h3>3.2.6 Summary</h3>
+			<p>In this step, we tried to find a connection between github repository characteristics and the marketcap of cryptocurrencies. These are the results:
+			<ul>
+			<li>There is a correlation between marketcap and number of stargazers, but it is not very high when eliminating outliers</li>
+			<li>Bitcoin and ethereum are way bigger in every metric than the other currencies and influence results heavily
+			<li>The age of a cryptocurrency (or its github repository) has very little influence on its marketcap</li>
+			<li>Even when combining stargazers, forks and age into one model, we get quite bad results. This is in part due to hard forks like bitcoin-cash</li>
+			<li>There is further action required to fit a model that actually predicts the marketcap reliably.</li>
+			</ul>
+			<br>
+			<a name="3.3"></a>
+			<h2>3.3 Analysing communities</h2>
+			<p>As a recap, earlier we created a network of all the "following" relationships between the GitHub user. An algorithm was used to partition this network into communities, while minising the error. The optimal value of communties was found to be 100. However most of the communities were small with 76 communities containing only two or three users.</p>
+			<p>Further analysis was carried on the 16 communites with over 100 members.</p>
+			<p>
         </div>
         <div style="height:200px"></div>
     </body>
