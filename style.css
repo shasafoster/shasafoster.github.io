@@ -16,11 +16,20 @@ h1, h2 {
 	line-height: 150%;
 }
 
-	
+a {
+    text-decoration: none !important;
+    color: red;
+}
+}
+
 .emphasis {
 	font-weight: 700
 }
 
+img {
+    max-width: 98%;
+    max-height: 100%;
+}
 
 
 li {
@@ -30,7 +39,7 @@ li {
     float: left;
 }
 
-a {
+.a_nav {
     display: block;
     padding: 8px;
     color: red;
