@@ -310,8 +310,166 @@
 			<h2>3.3 Analysing communities</h2>
 			<p>As a recap, earlier we created a network of all the "following" relationships between the GitHub user. An algorithm was used to partition this network into communities, while minising the error. The optimal value of communties was found to be 100. However most of the communities were small with 76 communities containing only two or three users.</p>
 			<p>Further analysis was carried on the 16 communites with over 100 members.</p>
-			<p>
-        </div>
+			<p>The next step into understanding the communities is looking into what makes the communities different from the  whole network. By comparing the relative "starring" of  crypto-currencies in  a community to the whole network we  can see the skew of the community.</p>
+			<p>In the lists of the results below a value of  9.0 means the crypto-currency is starred 9 times more than in the given community compared to the whole networ</p><br>
+
+			Community 1 (920)
+			<ul>
+				<li>bitcoindark: 9.0</li>
+				<li>bitcoin-plus: 8.1</li>
+				<li>centurion: 8.1</li>
+				<li>exclusivecoin: 5.8</li>
+				<li>sibcoin: 5.4</li>
+				<li>bitbay: 5.1</li>
+				<li>casinocoin: 5.1</li>
+			</ul>
+			<br>
+			Community 2 (3043)
+			<ul>
+				<li>salus 10.3</li>
+				<li>energycoin 5.2</li>
+				<li>bridgecoin 5.2</li>
+				<li>pinkcoin 5.2</li>
+				<li>masternodecoin 5.2</li>
+			</ul>
+			<br>
+			Community 3 (810)
+			<ul>
+				<li>posw-coin 13.5</li>
+				<li>cloakcoin 6.7</li>
+				<li>riecoin 6.0</li>
+			</ul>
+			<br>
+			Community 4 (2424)
+			<ul>
+				<li>rise 7.7</li>
+				<li>bridgecoin 7.7</li>
+			</ul>
+			<br>
+			Community 5 (543)
+			<ul>
+				<li>monacoin 17.2</li>
+				<li>centurion 14.1</li>
+				<li>sexcoin 7.9</li>
+			</ul>
+			<br>
+			Community 6 (218)
+			<ul>
+				<li>goldblocks 48.6</li>
+				<li>karbowanec 29.1</li>
+				<li>prizm 24.3</li>
+				<li>monero 12.1</li>
+				<li>mooncoin 10.1</li>
+				<li>aeon 9.6</li>
+				<li>digitalnote 9.4</li>
+				<li>htmlcoin 9.1</li>
+				<li>florincoin 8.1</li>
+				<li>ubiq 7.3</li>
+			</ul>
+			<br>
+			Community 8 (779)
+			<ul>
+				<li>rubycoin 6.1</li>
+				<li>bitcoindark 5.7</li>
+				<li>fedoracoin 5.2</li>
+			</ul>
+			<br>
+			Community 9 (1321)
+			<ul>
+				<li>pinkcoin 14.9</li>
+				<li>karbowanec 6.0</li>
+			</ul>
+			<br>
+			Community 12 (107)
+			<ul>
+				<li>viacoin 12.4</li>
+				<li>ubiq 9.9</li>
+				<li>blackcoin 9.9</li>
+				<li>factom 9.0</li>
+				<li>auroracoin 6.0</li>
+			</ul>
+			<br>
+			Community 14 (209)
+			<ul>
+				<li>leocoin 86.1</li>
+				<li>ion 24.6</li>
+				<li>digibyte 5.4</li>
+			</ul>
+			<br>
+			Community 15 (509)
+			<ul>
+				<li>radium 12.3</li>
+				<li>bitcoin-plus 12.4</li>
+				<li>posw-coin 7.8</li>
+				<li>blocknet 5.5</li>
+				<li>lykke 5.2</li>
+			</ul>
+			<br>
+			Community 16 (278)
+			<ul>
+				<li>emercoin 42.4</li>
+				<li>minexcoin 24.2</li>
+				<li>karbowanec 17.0</li>
+				<li>transfercoin 12.1</li>
+				<li>exclusivecoin 12.1</li>
+				<li>gamecredits 10.5</li>
+				<li>digitalnote 8.2</li>
+				<li>memetic 7.1</li>
+				<li>lomocoin 6.5</li>
+				<li>mooncoin 6.1</li>
+				</ul>
+			<br>
+			<a name="3.4"></a>
+			<h2>3.4 Wikipedia analysis</h2>
+			<h3>3.4.1 Goals</h3>
+			<p>In this section, we are going to take a closer look at the Wikipedia data we collected earlier. We want to gain insight about which articles are the longest and which words are used in the articles. Also, tf-idf analysis allows us to see the characteristics of several currencies.</p>
+			<h3>3.4.2 Article lengths</h3>
+			<p>As with the follower counts, the bigger currencies also have the longer Wikipedia articles. Interestingly, bitcoin does not have the longest article. This achievement goes to the currency <a href="https://en.wikipedia.org/wiki/Ripple_%28payment_protocol%29" target="_blank">Ripple</a>. This is due to the fact that Ripple is not only a currency, but also a payment protocol that is used by some of the largest banks and other powerful institutions in the world. Therefore, the Wikipedia article does not only cover the currency and is susequently longer.</p>
+			<h3>3.4.3 Wordcloud</h3>
+			<p>We next computed a statistic of how often each word occurs in the union of all articles. There chart below visualises our results.</p>
+			<img src="images/wordcloud.png">
+			<p>This vizualisation shows very nicely how important bitcoin and its success is for the whole industry. It is the central term that most of the other currencies are based on and look up to.</p>
+			<h3>3.4.4 Step 3: Setting up tf-idf</h3>
+			<p>We do not only want to see which currencies are the ones with the longest articles and which words are used the most, but also want to discover potential trends and unique words that might be used in specific articles more often than in others. In ordes to do this, we calculate the tf-idf scores of each Wikipedia page. tf-idf is short for term frequency - inverse document frequency and provides a way to measure how characteristic a word is for a text compared to other texts.</p>
+			<p>The most apparent observation from the td-idf results, is the fact that all currencies have their name as the top tf-idf score. This was expected. Other interesting observations may be:</p>
+			<ul>
+			<li>For bitcoin, the name "Nakamoto" has a very high score. Satoshi Nakamoto was the head of the research group that founded bitcoin in 2009. Also, the technology behind all cryptocurrencies, blockchain, has a high score.
+			For litecoin, the words "memory" and "scrypt" have high scores. The technology of litecoin uses the scrypt technique to make mining more and more expensive.</li>
+			<li>The currency dogecoin has a strong association with the forum reddit, hence the high tf-idf score.
+			As already mentioned, Ripple has high use in the financial sector, which can also be seen by the words "bank" and "financial" having high scores.</li>
+			<li>Coinye is a pun on US star Kanye West. The currency made news in 2014, when the rapper filed a lawsuit against the creators, which resulted in the discontinuation of the currency. The tf-idf scores are therefore highly influenced by this.</li>
+			<li>Monero is all sbout privacy, decentralization and confidentialness, what is heavily discussed reflected in its Wikipedia article.</li>
+			<li>There are many more characteristics and stories that can be found within the tf-idf scores, but this shall be enough for now.
+			</ul>
+
+			<h3>3.4.6 Summary</h3>
+			<p>The Wikipedia articles about cryyptocurrencies give some insight on them, but not too much. The first issue is that the pages are very few and most cryptocurrencies don't have a Wikipedia entry. Additionally, they tell very few things about the currency's community, what was the whole point of this project. Nevertheless, some interesting things were discovered:</p>
+			<ul>
+			<li>Larger currencies have longer Wikipedia articles, but it is not as clear as with the follower numbers</li>
+			<li>The most used words are all either currency names or terms concerning finance and programming</li>
+			<li>A tf-idf analysis can give a lot of information about a currency's history and specialties. There were a lot of things discovered with this technique</li>
+			<br>
+			<a name="4"></a>
+			<h2>4. Discussion</h2>
+			<p>As a conclusion to the explainer notebook, we briefly discuss the outcome of the project. Overall, the topic we selected for the assignment was interesting (in our opinion) and we could get all the data we wanted to get in the beginning. The only downside to it was the time it took to actually access the github api over 40000 times, which really narrowed down the time we had for the analysis. The Wikipedia part was not planned from the beginning, but adds another great aspect to the overall thing. Overall, we would summarize the project like this:</p>
+
+			<p><span style="font-weight: 700;">What went well:</span></p>
+			<ul>
+				<li>Gained all the data we wanted to get</li>
+				<li>Realized all the analysis steps we initially had in mind and even more</li>
+				<li>The discoveries about follower similarities were not expected and are fascinating (especially the correlations for bigger currencies)</li>
+				<li>Community detection was successful and reveals communities that make sense</li>
+				<li>The Wikipedia page analysis was more insightful than expected for the articles we could find</li>
+			</ul>
+			<p><span style="font-weight: 700;">What could be improved:</span></p>
+			<ul>
+				<li>Start with the data collection earlier to have more time for the analysis (Try to figure out how long it will take before making a roadmap)</li>
+				<li>The marketcap analysis was less successful than expected. Going deeper into this would have been nice, but would also go too far from the topic of the project</li>
+				<li>Plotly is a nice tool to make fancy plots but very resource intensive!</li>
+				<li>All analysis points could be extended further (This is always the case though, you can always dig even deeper)</li>
+				<li>The Wikipedia data is very sparse (only ~30 of over 300 currencies). Maybe other wikis have better info on cryptocurrencies</li>
+			</ul>
+
         <div style="height:200px"></div>
     </body>
 </html>
