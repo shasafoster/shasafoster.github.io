@@ -32,10 +32,10 @@ img {
 }
 
 
-li {
+.li1 {
     display: inline;
 }
-li {
+.li1 {
     float: left;
 }
 
