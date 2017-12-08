@@ -16,11 +16,23 @@ h1, h2 {
 	line-height: 150%;
 }
 
+#community_parent {
+  width:800px;
+  height: 900px;
+  margin-right: 0px;
+  float: left;
+}
+.community_child {
+  float: left;
+  margin-right: 0px;
+  width:266px;
+}
+
 a {
     text-decoration: none !important;
     color: red;
 }
-}
+
 
 .emphasis {
 	font-weight: 700
