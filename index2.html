@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link href="https://fonts.googleapis.com/css?family=Lato|Roboto|Raleway|PT+Sans" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+        <link href="./style.css" type="text/css" rel="stylesheet"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script>
+    </head>
+    <body style="margin:0;padding:0">
+    	<div id="header" class="center" style="width:800px;">
+			<nav class="center">
+				<li class='li1'><a class="a_nav" href="https://github.com/shasafoster/02805-Project">View On GitHub</a></li>
+				<li class='li1'><a class="a_nav" href="https://github.com/shasafoster/02805-Project/blob/master/Explainer%20Notebook.ipynb">Explainer Notebook</a></li>
+				<li class='li1'><a class="a_nav" href="/shasafoster/02805-Project/archive/master.zip">Repo ZIP</a></li>
+			</nav>
+		</div>
+        <div id="container" class="center" style="width:800px;">
+            <h1>Analysis of GitHub communities in the development of crypto-currencies</h1>
+            <p> by Johannes Ostner and Shasa Foster</p>
+            <p>December 2017</p>
+            <br>
+            <h2>Table of Contents</h2>
+            <ol style="list-style-type:none">
+            	<li><a href="#1">1. Motivation</a>
+		    		<ul style="list-style-type:none">
+		    			<li><a href="#1.1">1.1 How and why we want to analyze the cryptocurrency developer community</a></li>
+		    			<li><a href="#1.2">1.2 Dataset description</a></li>
+		    			<li><a href="#1.3">1.3 Goals for user experience</a></li>
+		    		</ul>
+	    		</li>
+	    		<li><a  href="#2">2. The data</a>
+	    			<ul style="list-style-type:none">
+	    				<li><a href="#2.1">2.1 Dataset collection and setup</a></li>
+    					<li><a href="#2.2">2.2 Summary statistics and basic properties of the network</a></li>
+	    			</ul>
+	    		</li>
+	    		<li><a  href="#3">3. The Analysis</a>
+	    			<ul style="list-style-type:none">
+	    				<li><a href="#3.1">3.1 Follower similarity</a></li>
+	    				<li><a href="#3.2">3.2 Analyzing folloing vs. marketcap</a></li>
+	    				<li><a href="#3.3">3.3 Analysing communities</a></li>
+	    				<li><a href="#3.4">3.4 Wikipedia analysis</a></li>
+	    			</ul>
+	    		</li>
+
+            	<li>
+            		<a href="#4">4. Discussion</a>
+            	</li><br>
+            </ol>
+
+            <a name="1"></a>
+            <h1>1. Motivation</h2>
+            <a name="1.1"></a>
+			<h2>1.1 How and why we want to analyze the cryptocurrency developer community</h3>
+			<p>Cryptocurrencies are maybe the most interesting economic phenomenon in recent years. Being able to basically generate money by running computer algorithms and doing very little work after an initial setup is a very tempting outlook for everybody. And even though the possible uses of bitcoin and co. to actually buy stuff from the real world are still limited, more and more people have jumped on the train of mining and trading with cryptocurrencies, resulting in huge value increases. In 2017 alone, the worth of bitcoin, the oldest, most common and most valuable cryptocurrency, has increased more than tenfold, eclipsing the 10,000$ mark on November 28th. This has lead to some interesting developments in recent time, such as prices for some computer hardware, especially powerful graphics cards, almost doubling in the last year.</p>
+			<img src="images/bitcoin-pricechart.png" alt="Bitcoin pricechart">
+			<p>But just as more and more people have begun to join the virtual gold rush and try their luck at mining bitcoins with their home equipment, other groups of programming enthusiasts and cryptology specialists have started to create alternatives to the almighty bitcoin, resulting in hundreds of more or less valuable virtual forms of money being available and ready to be mined. In order to do so, one has to get a piece of source code from the internet, which is most of the time stored on github.</p>
+			<p>Github itself, again, is not only a way to share and collaborate on programmin projects, but also has functions that make it a social platform, such as the ability to follow another user or to "like" a certain project or code reporitory. This second act is called "stargazing" in github terms. And that"s where data science and social graphs come into play. We want to find out, how the stargazer community of different cryptocurrencies is shaped. In order to do so, we need to get the necessary information about the code repositories via the github api and then analyze it with tools of network science.</p>
+			<p>We also want to take a look at the Wikipedia entries of some cryptocurrencies and try to find differences in word choice, etc. Because most of the digital currencies are very new or small, the number of Wikipedia entries is very limited.</p>
+			
+			<p><span style="font-weight:700">TL;DR: We want to analyze the community of cryptocurrency enthusiasts on github and the corresponding Wikipedia pages. We want to do this, because it is a booming, highly discussed industry that could change the face of the financial world</span><p>
+			<br>
+
+			<a name="1.2"></a>
+			<h2>1.2 Dataset description</h2>
+			<p>The dataset that we collected and analyzed contains the github repositories for over 300 cryptocurrencies and their stargazers. Also, we have information on which of the users that starred one of the repositories follow each other. The second piece of data are the Wikipedia pages to some of the aforementioned currencies.</p>
+			<br>
+
+			<a name="1.3"></a>
+			<h2>1.3 Goals for user experience</h2>
+			<p>With the website, we want to provide insight to several questions about the cryptocurrency community:
+			<ul>
+			<li><span style="font-weight:700">How is github relevance connected to a currency"s market value?</span></li>
+			<li><span style="font-weight:700">What are the similarities between several cryptocurrencies" following bases?</span></li>
+			<li><span style="font-weight:700">Are there communities within the group of users starring cryptocurrency repositories?</span></li>
+			<li><span style="font-weight:700">What can we gain from analyzing the Wikipedia pages of certain currencies?</span></li>
+			</ul>
+			</p>
+			<br><br><br><br><br><br>
+			<a name="2"></a>
+			<h1>2. The data</h1>
+			<a name="2.1"></a>
+			<h2>2.1 Dataset collection and setup</h2>
+			<h3>2.1.1 Stargazer network data collection</h3>
+			<p>To gain an insight on which cryptocurrencies exist and where to find their source code, we first need a place to gain this information from. On <a href="http://www.coinmarketcap.com" target="_blank">coinmarketcap.com</a>, we can find all the cryptocurrencies" names.  We used web scraping to extract the names of over 1300 crpyto-currencies.</p>
+			<p>As a next step, we need to find the actual github repositories for the currencies. The site <a href="http://www.coingecko.com" target="_blank">coingecko.com</a> allows us to get this information (Note that not all cryptocurrencies have github repositories, thus we will end up with a shorter list than before)</p>
+			<p>We where successful in finding the repositories of over the vast majority of significant crypto-currency projects. For example in the top 50 crypto-currencies by marketcap only 4 do not have an active git repository.
+			<br> 
+			<p>These are:</p>
+			<ul>
+				<li style="display: list-item">Stellar-Lumens (no. 17 by market cap)</li>
+				<li style="display: list-item">Byteball-btyes (no. 31 by market cap)</li>
+				<li style="display: list-item">Metaverse-etp (no. 38 by market cap)</li>
+				<li style="display: list-item">Vechain (no. 47 by market cap)</li>	
+			</ul>
+			<p>Now we are finally ready to get the data we will be working with. By using the github API (a way to get data from GitHub) and the python package PyGithub we can get all the needed information about the cryptocurrencies" repositories.</p><br>
+        	<h3>2.1.2 Stargazer network setup</h3>
+        	<p>With the data we gained, we can now set up a network with the following properties:</p>
+        	<ul>
+        	<li style="display: list-item">Nodes can either be users or currencies. This is specified by a node attribute "Type"</li>
+        	<li style="display: list-item">Edges are either of the type gazes (User-to-currency) or follows (user-to-user)</li>
+        	</ul>
+        	<br>
+        	<h3>2.1.3 Add links between users</h3>
+        	<p>Now that we know which users starred the cryptocurrencies, we can add connections between these, depending on which users follow a certain person on github. These connections will be represented in the graph as additional edges.</p>
+			<p>An edge points from one github user to another if the user follows the other user on github.</p>
+			Hence,
+			<ul>
+			<li style="display: list-item">edges representing a users "following" are pointing to the user. (from other users to the user)</li>
+			<li style="display: list-item">edges representing a users "follows" are poining away from the user (from the user to their followers)</li>
+			</ul>
+			<p>By getting the users that a given user is following for every user in the network and intersecting this with the users already in the network (as as most of the users a user is following do not have starred any of the github communities) we will be able to create</p><br>
+        	
+        	<h3>2.1.4 Wikipedia entry collection</h3>
+        	<p>The second set of data we are going to analyze are Wikipedia pages of cryptocurrencies. We can find a list of Wikipedia"s pages about these <a href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">here</a>. After downloading it, we can find all the links to pages covering specific currencies.</p>
+        	<p>We access each link to each specific crypto-currency, and then download the wikipedia page for the crypto-currency.</p>
+        	<a name="2.2"></a><br>
+  			<h2>2.2 Summary statistics and basic properties of the network</h2>
+        	<h3>The stargazer part</h3>
+        	<p>After collecting all our data, we can start looking into it. First, we need an overview of how big our stargazer network is</p>
+        	<ul>
+        		<li>The network has 390 crypto-currencies (representing 99.5%+ of the marketcap)
+        		<li>The network has 40821 GitHub users</li>
+        		<li>The network has 57462 total "stars" (a "star" means user has starred a GitHub repository</li>
+        	</ul>
+        	<p>We will now look at how many crypto-currency repositories a GitHub users has starred. The chart below shows a histgram of how many repositores (the degree on x-axis corresponds to number of repositories starred by a user) have been starred by the users.</p>
+        	<img src="images/stargazing_degree_distribution.png" alt="Currency degree distribution">
+        	<p>Most users follow only one currency, but some follow more than one, resulting in a power-law distribution. Users are on average subscribed to 1.4 currencies. The maximum number of currencies stargazed is 43 ("followtheart").</p>
+
+        	<p>We now look at how many stars a crypto-currency GitHub repository has. </p>
+        	<img src="images/currency_degree_distribution.png" alt="Currency degree distribution">
+        	<p>For currencies, we have an even steeper power-law distribution of degrees. Most currencies have only very few stargazers, while only a few eclipse the 1000 stargazers mark. Unsurprisingly, bitcoin takes the cake with nearly 20000 stargazers, followed by the second most popular currency, ethereum. On average, a currency has about 147 stargazers. This is influenced heavily by the big currencies though (The median is at only 6 subscribers).</p><br>
+
+        	<h3>2.2.2 The follower part</h3>
+        	<p>We also need to take a look at the users following each other. </p>
+        	<p style="font-weight:700">Some basic statistics for in-degrees (the number of followers a user has) are:</p>
+        	<ul>
+        		<li>Average number of followers of user</li>
+        		<li>Median number of followers of user</li>
+        	</ul><br>
+        	<p style="font-weight:700">Top followed users:</p>	
+        	<ol>
+	        	<li>kennethreitz: 752 followings</li>
+	        	<li>clowwindy: 450 followings</li>
+	        	<li>igrigorik: 356 followings</li>
+	        	<li>BYVoid: 323 followings</li>
+	        	<li>laanwj: 321 followings</li>
+        	</ol>
+        	<img src="images/follower_in_degree_distribution.png">
+			<p>Like the stargazing degrees, this statistic follows a power law. The average user has 1 person follwing him (The mean is very skewed by the top users). The most followed user is actually Kenneth Reitz, the leading Python developer. This points out the relevance that Python has in the cryptocurrency community.
+			We will do the same thing for the out-degrees (number of users a given user is following) too:</p>        	
+			<img src="images/follower_out_degree_distribution.png">
+			<p>The distribution of this statistic is extreme. More than half of the users don"t even follow a single other user in the community (median=0), while there are a few users that follow a lot of others. At least the top 2 users havd most likely used the github API to follow users automatically.
+			After this first analysis, we can dig deeper into certain aspects of the cryptocurrency github commumnity:</p>
+        	
+        	<a name="3"></a>
+        	<h1>3. The analysis</h1>
+        	<a name="3.1"></a>
+        	<h2>3.1 Follower Similiarity</h2>
+        	<h3>3.1.1 Goals</h3>
+			<p>We want to take a closer look at the follower communities of the individual currencies and find out how similar they are to each other, e.g. see for a pair of cryptocurrencies, how many people have stargazed both of them. Then we can look at how these similarities behave and see whether there are some patterns or not.</p>
+
+			<span style="font-weight:700">Highest similarities:</span>
+			<ul>
+				<li>("steem", "steem-dollars"): Similarity 1.0</li>
+				<li>("nav-coin", "bitdeal"): Similarity 1.0</li>
+				<li>("e-dinar-coin", "edrcoin"): Similarity 1.0</li>
+				<li>("breakout-stake", "breakout"): Similarity 1.0</li>
+				<li>("ultracoin", "incakoin"): Similarity 1.0</li>
+			</ul><br>
+
+			<span style="font-weight:700">Lowest similarities:</span>
+			<ul>	
+				<li>("bitcoin", "nolimitcoin"): Similarity 0.0</li>
+				<li>("bitcoin", "leocoin"): Similarity 0.0</li>
+				<li>("bitcoin", "einsteinium"): Similarity 0.0</li>
+				<li>("bitcoin", "toacoin"): Similarity 0.0</li>
+				<li>("bitcoin", "salus"): Similarity 0.0</li>
+			</ul>
+
+        	<h3>3.1.4 Step 3: Analysis of one similarity entries</h3>	
+			<p>Lets look closer at  the  crypto-currencies with a similiarity of one. A similiarity of one means the crypto-currencies have  been starred by exactly the same users.</p>
+			<ul>
+			<li>steem: 648 - steem-dollars: 648</li>
+			<li>nav-coin: 26 - bitdeal: 26</li>
+			<li>e-dinar-coin: 5 - edrcoin: 5</li>
+			<li>breakout-stake: 5 - breakout: 5</li>
+			<li>ultracoin: 1 - incakoin: 1</li>
+			<li>zurcoin: 1 - argentum: 1</li>
+			<li>cypher: 1 - spacecoin: 1</li>
+			<li>1337: 4 - falcoin: 4</li>
+			<li>britcoin: 1 - ratecoin: 1</li>
+			<li>virtacoinplus: 73 - virtacoin: 73</li>
+			</ul>
+			<p>We may disregard repositories with only one stargazer. These have no informative value. The others are pretty self-explanatory: Currencies with similar names (e.g. steem, steem-dollars) simply share the same github repository thus have the same stargazers.</p><br>
+        	<h3>3.1.5 Analysis of zero similarity entries</h3>
+        	<p>A similiarity of zero means the crypto-currencies have no common users who have starred them. Crypto-currency pairs in which one of the crypto-currencies had zero stars were removed as the result is meaningless. Below is a list of crypto-currency pairs with a similiarity of zero</p>
+        	<p>
+			<ul>
+				<li>lbry-credits, virtacoinplus</li>
+				<li>lbry-credits, virtacoin</li>
+				<li>ripple, okcash</li>
+				<li>bitcoin, signatum</li>
+				<li>bitcoin, trustplus</li>
+				<li>ethereum, synergy</li>
+				<li>bitcoin, earthcoin</li>
+				<li>lisk, gambit</li>
+				<li>bitcoin, heat</li>
+				<li>litecoin, virtacoinplus</li>
+				<li>litecoin, virtacoin</li>
+				<li>achain, lbry-credits</li>
+				<li>bitcoin, pandacoin</li>
+				<li>siacoin, virtacoinplus</li>
+				<li>siacoin, virtacoin</li>
+				<li>zcash, paycoin</li>
+				<li>ripple, virtacoinplus</li>
+				<li>ripple, virtacoin</li>
+				<li>ethereum, signatum</li>
+				<li>bitcoin, evergreencoin</li>
+			</ul>
+        	<h3>3.1.6 Step 5: Analysis of other similarity entries</h3>
+        	<p>After covering the borders of the spectrum of similarities, we now get to the core. Let's analyze the currencies that have not entirely similar or dissimilar communities.</p>
+        	<p>The average similiarity was found to be 0.01556.</p>
+
+			<p>Maximal similarities:</p>
+			<ul>
+			<li>('masternodecoin', 'innova'): Similarity 0.5</li>
+			<li>('audiocoin', 'dfscoin'): Similarity 0.5</li>
+			<li>('ultracoin', 'steps'): Similarity 0.5</li>
+			<li>('triangles', 'britcoin'): Similarity 0.5</li>
+			<li>('triangles', 'ratecoin'): Similarity 0.5</li>
+			<li>('incakoin', 'steps'): Similarity 0.5</li>
+			<li>('innova', 'desire'): Similarity 0.4</li>
+			<li>('dynamic', 'sequence'): Similarity 0.375</li>
+			<li>('masternodecoin', 'force'): Similarity 0.33</li>
+			<li>('machinecoin', 'fujicoin'): Similarity 0.33</li>
+			</ul>
+
+			<p>Minimal similarities:</p>
+			<ul>
+			<li>('bitcoin', 'blitzcash'): Similarity 5.205e-05</li>
+			<li>('bitcoin', 'magi'): Similarity 5.206e-05</li>
+			<li>('bitcoin', 'dynamic'): Similarity 5.207e-05</li>
+			<li>('bitcoin', 'memetic'): Similarity 5.207e-05</li>
+			<li>('bitcoin', 'arcticcoin'): Similarity 5.208e-05</li>
+			<li>('bitcoin', 'ethereum-dark'): Similarity 5.208e-05</li>
+			<li>('bitcoin', 'eternity'): Similarity 5.208e-05</li>
+			<li>('bitcoin', 'cloakcoin'): Similarity 5.208e-05</li>
+			<li>('bitcoin', 'fantomcoin'): Similarity 5.208e-05</li>
+			<li>('bitcoin', 'ion'): Similarity 5.209e-05</li>
+			</ul>
+			<p>For maximal values, we only get very small currencies, whose share one of two or three total users. For minimal values, bitcoin with its huge userbase has a spot in in all top entries (what was to be expected).</p>
+			<img src="images/similarity_distribution.png">
+        	The values are exponentially distributed, which is no surprise. Also, the overall values are very low. We now want to see if there is a dependency between follower community size and community similarity. Therefore, we plot a pair's combined community size against their similarity:
+            <img src="images/stargazer_count_and_similarity.png">
+      		<p>Most values bunch up in the bottom, the small currencies' outliers in similarity are clearly visible at the left edge. Also, the points generated by the two biggest currencies bitcoin and ethereum are clearly visible as bunches towards the right. Astonishingly, there seems to be a positive correlation between the second currency's follower base and the similarity.</p>
+			<p>We thus want to investigate the currencies with big following bases nearer:</p>
+			<h3>3.1.7 Step 6: The big fishes</h3>
+			<p>We seem to oberve a correlation between 2nd currency follower counts and similarity for each currency. After further investigation, this observation of positive correlation between followers and similarity only holds for the big currencies. It even completely flips for currencies outside of the top 10. We can visualize it with a chart.</p>
+			<img src="images/stargazer_count_and_similarity_correlation.png">
+			<p>So for the biggest currencies we can say that follower similarity increases with the size of the second currency, for the less big currencies it is the other way around.</p>
+			<h3>3.1.8 Summary</h3>
+			<p>This analysis step provides some insight on how similar currency follower groups are. Setting the similarity measuremant to the Jaccard coefficient, we get the following results:</p>
+			<ul>
+				<li>Some currencies actually share a github repository. They are also normally named similarly.</li>
+				<li>Zero similarity is often caused by a currency having no stargazers.</li>
+				<li>The currencies virtacoin and virtacoinplus seem to have a follower base that is very distinct from the others</li>
+				<li>Not even 10% of all currency pairs share at least one user</li>
+				<li>For the biggest 20 cryptocurrencies, some interesting trends can be observed:
+				<ul>
+					<li>For the biggest currencies, user similarity is higher with other very big currencies than with smaller ones</li>
+					<li>For a little bit smaller curerncies, it is the other way.</li>
+				</ul></li>
+			</ul>
+			<a name='3.2'></a>
+			<h2>3.2 Analyzing followers vs. marketcap</h2>
+			<h3>3.2.1 Goals</h3>
+			<p>Now we want to add the most important attribute of a cryptocurrency into the mix - its marketcap. We want to discover whether statistics about the github repository of a currency can tell something about its economic value.</p>
+			<p>We downloaded marketcap values for the cryptocurrencies from <a href="https://coinmarketcap.com" target="_blank">coinmarketcap.com</a>. Now, we cann add these as node attributes to our graph.</p>
+			<img src="images/stargazer_count_and_market_cap.png">
+			<p>The correlation between follower count and marcetcap as found to be 0.94. This looks very good at first glance but plotting the data reveals that bitcoin and ethereum have such a big marketcap and follower basis that it renders the other currencies irrelevant. Hence, we will replot but the bitcoin and ethereum datapoints will be dropped.</p>
+			<img src="images/stargazer_count_and_market_cap_without_BTC_or_ETH.png">
+			<p>When looking at the same plot without the two currencies, we get a totally different picture and a much worse correlation. The correlation between follower count and marketcap without bitcoin or ethereum is 0.27.
+			<p>We can clearly see that there is no strong dependency between the two variables. Thus, we will try to find other variables that influence the marketcap</p>
+			<h3>3.2.4 Step 3: New variables</h3>
+			<p>We now want to find other variables that could have an impact on marketcap. First, we look at the time a currency's repository was created. We then calculate its age in days (until 3rd December 2017) and compare it to the monetary value. Because bitcoin and ethereum were some of the first currencies and are the biggest, we suspect a correlation. Wefound the correlation between age and marketcap to be 0.17</p>
+			<p>There is no good correlation, because many of the old currencies never made it big despite their age. We will therefore put this on ice.</p>
+			<p>Another idea would be the number of forks. If you want to experiment with code and maybe use it for your purposes, you need to create a fork. The idea is that cryptocurrencies with a high marketcap will have a high number of forks.</p>
+			<p>The correlation between the number of forks of a crypto-currency and marketcap was found to be 0.96</p>
+			<img src="images/forks_versus_marketcap.png">
+			<p>Again, bitcoin and ethereum falsify the result, so we take a closer look at the others. After removing Bitcoin and Ethereum from the data the correlation between forks and marketcap is 0.23</p>
+			<img src="images/forks_versus_marketcap_without_BTC_or_ETH.png">
+			<p>This metric is very similar to the follower count. The points are nearly at the same spots as in the corresponding follower plot. The correlation between these two attributes confirms this with correlation between forks and stargazers at 0.51</p>
+			<h3>3.2.5 Step 4: Multiple regression model</h3>
+			<p>Now we try our luck at putting a combination of these variables into one model to predict the marketcap. We will therefore leave out bitcoin and ethereum, as they are clear outliers and would heavily skew the result. We will try several combinations of the three attributes and compare their error. The model with the loest error will be the best one.</p>
+			<p>The model with all three attributes (age, stargazers, forcks) has the lowest error. However  the error istoo high to predict the marketcap of a cryptocurrency reliably. The marketcap of a cryptocurrency has probably different reasons than the information we can get from github. Take for example the currency "bitcoin-cash": It is a so-called hard fork of bitcoin that was introduced in July 2017. Thus, it has the third-highest marketcap of all the currencies in our dataset despite being very young and not having many stargazers on github.</p>
+			<h3>3.2.6 Summary</h3>
+			<p>In this step, we tried to find a connection between github repository characteristics and the marketcap of cryptocurrencies. These are the results:
+			<ul>
+			<li>There is a correlation between marketcap and number of stargazers, but it is not very high when eliminating outliers</li>
+			<li>Bitcoin and ethereum are way bigger in every metric than the other currencies and influence results heavily
+			<li>The age of a cryptocurrency (or its github repository) has very little influence on its marketcap</li>
+			<li>Even when combining stargazers, forks and age into one model, we get quite bad results. This is in part due to hard forks like bitcoin-cash</li>
+			<li>There is further action required to fit a model that actually predicts the marketcap reliably.</li>
+			</ul>
+			<br>
+			<a name="3.3"></a>
+			<h2>3.3 Analysing communities</h2>
+			<p>As a recap, earlier we created a network of all the "following" relationships between the GitHub user. An algorithm was used to partition this network into communities, while minising the error. The optimal value of communties was found to be 100. However most of the communities were small with 76 communities containing only two or three users.</p>
+			<p>Further analysis was carried on the 16 communites with over 100 members.</p>
+			<p>The next step into understanding the communities is looking into what makes the communities different from the  whole network. By comparing the relative "starring" of  crypto-currencies in  a community to the whole network we  can see the skew of the community.</p>
+			<p>In the lists of the results below a value of  9.0 means the crypto-currency is starred 9 times more than in the given community compared to the whole networ</p><br>
+
+			Community 1 (920)
+			<ul>
+				<li>bitcoindark: 9.0</li>
+				<li>bitcoin-plus: 8.1</li>
+				<li>centurion: 8.1</li>
+				<li>exclusivecoin: 5.8</li>
+				<li>sibcoin: 5.4</li>
+				<li>bitbay: 5.1</li>
+				<li>casinocoin: 5.1</li>
+			</ul>
+			<br>
+			Community 2 (3043)
+			<ul>
+				<li>salus 10.3</li>
+				<li>energycoin 5.2</li>
+				<li>bridgecoin 5.2</li>
+				<li>pinkcoin 5.2</li>
+				<li>masternodecoin 5.2</li>
+			</ul>
+			<br>
+			Community 3 (810)
+			<ul>
+				<li>posw-coin 13.5</li>
+				<li>cloakcoin 6.7</li>
+				<li>riecoin 6.0</li>
+			</ul>
+			<br>
+			Community 4 (2424)
+			<ul>
+				<li>rise 7.7</li>
+				<li>bridgecoin 7.7</li>
+			</ul>
+			<br>
+			Community 5 (543)
+			<ul>
+				<li>monacoin 17.2</li>
+				<li>centurion 14.1</li>
+				<li>sexcoin 7.9</li>
+			</ul>
+			<br>
+			Community 6 (218)
+			<ul>
+				<li>goldblocks 48.6</li>
+				<li>karbowanec 29.1</li>
+				<li>prizm 24.3</li>
+				<li>monero 12.1</li>
+				<li>mooncoin 10.1</li>
+				<li>aeon 9.6</li>
+				<li>digitalnote 9.4</li>
+				<li>htmlcoin 9.1</li>
+				<li>florincoin 8.1</li>
+				<li>ubiq 7.3</li>
+			</ul>
+			<br>
+			Community 8 (779)
+			<ul>
+				<li>rubycoin 6.1</li>
+				<li>bitcoindark 5.7</li>
+				<li>fedoracoin 5.2</li>
+			</ul>
+			<br>
+			Community 9 (1321)
+			<ul>
+				<li>pinkcoin 14.9</li>
+				<li>karbowanec 6.0</li>
+			</ul>
+			<br>
+			Community 12 (107)
+			<ul>
+				<li>viacoin 12.4</li>
+				<li>ubiq 9.9</li>
+				<li>blackcoin 9.9</li>
+				<li>factom 9.0</li>
+				<li>auroracoin 6.0</li>
+			</ul>
+			<br>
+			Community 14 (209)
+			<ul>
+				<li>leocoin 86.1</li>
+				<li>ion 24.6</li>
+				<li>digibyte 5.4</li>
+			</ul>
+			<br>
+			Community 15 (509)
+			<ul>
+				<li>radium 12.3</li>
+				<li>bitcoin-plus 12.4</li>
+				<li>posw-coin 7.8</li>
+				<li>blocknet 5.5</li>
+				<li>lykke 5.2</li>
+			</ul>
+			<br>
+			Community 16 (278)
+			<ul>
+				<li>emercoin 42.4</li>
+				<li>minexcoin 24.2</li>
+				<li>karbowanec 17.0</li>
+				<li>transfercoin 12.1</li>
+				<li>exclusivecoin 12.1</li>
+				<li>gamecredits 10.5</li>
+				<li>digitalnote 8.2</li>
+				<li>memetic 7.1</li>
+				<li>lomocoin 6.5</li>
+				<li>mooncoin 6.1</li>
+				</ul>
+			<br>
+			<a name="3.4"></a>
+			<h2>3.4 Wikipedia analysis</h2>
+			<h3>3.4.1 Goals</h3>
+			<p>In this section, we are going to take a closer look at the Wikipedia data we collected earlier. We want to gain insight about which articles are the longest and which words are used in the articles. Also, tf-idf analysis allows us to see the characteristics of several currencies.</p>
+			<h3>3.4.2 Article lengths</h3>
+			<p>As with the follower counts, the bigger currencies also have the longer Wikipedia articles. Interestingly, bitcoin does not have the longest article. This achievement goes to the currency <a href="https://en.wikipedia.org/wiki/Ripple_%28payment_protocol%29" target="_blank">Ripple</a>. This is due to the fact that Ripple is not only a currency, but also a payment protocol that is used by some of the largest banks and other powerful institutions in the world. Therefore, the Wikipedia article does not only cover the currency and is susequently longer.</p>
+			<h3>3.4.3 Wordcloud</h3>
+			<p>We next computed a statistic of how often each word occurs in the union of all articles. There chart below visualises our results.</p>
+			<img src="images/wordcloud.png">
+			<p>This vizualisation shows very nicely how important bitcoin and its success is for the whole industry. It is the central term that most of the other currencies are based on and look up to.</p>
+			<h3>3.4.4 Step 3: Setting up tf-idf</h3>
+			<p>We do not only want to see which currencies are the ones with the longest articles and which words are used the most, but also want to discover potential trends and unique words that might be used in specific articles more often than in others. In ordes to do this, we calculate the tf-idf scores of each Wikipedia page. tf-idf is short for term frequency - inverse document frequency and provides a way to measure how characteristic a word is for a text compared to other texts.</p>
+			<p>The most apparent observation from the td-idf results, is the fact that all currencies have their name as the top tf-idf score. This was expected. Other interesting observations may be:</p>
+			<ul>
+			<li>For bitcoin, the name "Nakamoto" has a very high score. Satoshi Nakamoto was the head of the research group that founded bitcoin in 2009. Also, the technology behind all cryptocurrencies, blockchain, has a high score.
+			For litecoin, the words "memory" and "scrypt" have high scores. The technology of litecoin uses the scrypt technique to make mining more and more expensive.</li>
+			<li>The currency dogecoin has a strong association with the forum reddit, hence the high tf-idf score.
+			As already mentioned, Ripple has high use in the financial sector, which can also be seen by the words "bank" and "financial" having high scores.</li>
+			<li>Coinye is a pun on US star Kanye West. The currency made news in 2014, when the rapper filed a lawsuit against the creators, which resulted in the discontinuation of the currency. The tf-idf scores are therefore highly influenced by this.</li>
+			<li>Monero is all sbout privacy, decentralization and confidentialness, what is heavily discussed reflected in its Wikipedia article.</li>
+			<li>There are many more characteristics and stories that can be found within the tf-idf scores, but this shall be enough for now.
+			</ul>
+
+			<h3>3.4.6 Summary</h3>
+			<p>The Wikipedia articles about cryyptocurrencies give some insight on them, but not too much. The first issue is that the pages are very few and most cryptocurrencies don't have a Wikipedia entry. Additionally, they tell very few things about the currency's community, what was the whole point of this project. Nevertheless, some interesting things were discovered:</p>
+			<ul>
+			<li>Larger currencies have longer Wikipedia articles, but it is not as clear as with the follower numbers</li>
+			<li>The most used words are all either currency names or terms concerning finance and programming</li>
+			<li>A tf-idf analysis can give a lot of information about a currency's history and specialties. There were a lot of things discovered with this technique</li>
+			<br>
+			<a name="4"></a>
+			<h2>4. Discussion</h2>
+			<p>As a conclusion to the explainer notebook, we briefly discuss the outcome of the project. Overall, the topic we selected for the assignment was interesting (in our opinion) and we could get all the data we wanted to get in the beginning. The only downside to it was the time it took to actually access the github api over 40000 times, which really narrowed down the time we had for the analysis. The Wikipedia part was not planned from the beginning, but adds another great aspect to the overall thing. Overall, we would summarize the project like this:</p>
+
+			<p><span style="font-weight: 700;">What went well:</span></p>
+			<ul>
+				<li>Gained all the data we wanted to get</li>
+				<li>Realized all the analysis steps we initially had in mind and even more</li>
+				<li>The discoveries about follower similarities were not expected and are fascinating (especially the correlations for bigger currencies)</li>
+				<li>Community detection was successful and reveals communities that make sense</li>
+				<li>The Wikipedia page analysis was more insightful than expected for the articles we could find</li>
+			</ul>
+			<p><span style="font-weight: 700;">What could be improved:</span></p>
+			<ul>
+				<li>Start with the data collection earlier to have more time for the analysis (Try to figure out how long it will take before making a roadmap)</li>
+				<li>The marketcap analysis was less successful than expected. Going deeper into this would have been nice, but would also go too far from the topic of the project</li>
+				<li>Plotly is a nice tool to make fancy plots but very resource intensive!</li>
+				<li>All analysis points could be extended further (This is always the case though, you can always dig even deeper)</li>
+				<li>The Wikipedia data is very sparse (only ~30 of over 300 currencies). Maybe other wikis have better info on cryptocurrencies</li>
+			</ul>
+
+        <div style="height:200px"></div>
+    </body>
+</html>
