@@ -28,6 +28,8 @@ h1, h2 {
   width:266px;
 }
 
+.center { margin: 0 auto; width: 600px; height: 400px;}
+
 a {
     text-decoration: none !important;
     color: red;
